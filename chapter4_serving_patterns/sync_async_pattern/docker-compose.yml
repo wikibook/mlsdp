@@ -1,0 +1,68 @@
+version: "3"
+
+services:
+  proxy:
+    container_name: proxy
+    image: shibui/ml-system-in-actions:sync_async_pattern_sync_async_proxy_0.0.1
+    restart: always
+    environment:
+      - PLATFORM=docker_compose
+      - QUEUE_NAME=tfs_queue
+      - REST_MOBILENET_V2=sync:8501
+      - REST_INCEPTION_V3=async:8601
+      - GRPC_MOBILENET_V2=sync:8500
+      - GRPC_INCEPTION_V3=async:8600
+    ports:
+      - "8000:8000"
+    command: ./run.sh
+    depends_on:
+      - redis
+      - sync
+      - async
+      - backend
+
+  sync:
+    container_name: sync
+    image: shibui/ml-system-in-actions:sync_async_pattern_imagenet_mobilenet_v2_0.0.1
+    restart: always
+    environment:
+      - PORT=8500
+      - REST_API_PORT=8501
+    ports:
+      - "8500:8500"
+      - "8501:8501"
+    entrypoint: ["/usr/bin/tf_serving_entrypoint.sh"]
+
+  async:
+    container_name: async
+    image: shibui/ml-system-in-actions:sync_async_pattern_imagenet_inception_v3_0.0.1
+    restart: always
+    environment:
+      - PORT=8600
+      - REST_API_PORT=8601
+    ports:
+      - "8600:8600"
+      - "8601:8601"
+    entrypoint: ["/usr/bin/tf_serving_entrypoint.sh"]
+
+  backend:
+    container_name: backend
+    image: shibui/ml-system-in-actions:sync_async_pattern_sync_async_backend_0.0.1
+    restart: always
+    environment:
+      - PLATFORM=docker_compose
+      - QUEUE_NAME=tfs_queue
+      - REST_MOBILENET_V2=sync:8501
+      - REST_INCEPTION_V3=async:8601
+      - GRPC_MOBILENET_V2=sync:8500
+      - GRPC_INCEPTION_V3=async:8600
+    entrypoint:
+      ["python", "-m", "src.api_composition_proxy.backend.prediction_batch"]
+    depends_on:
+      - redis
+
+  redis:
+    container_name: redis
+    image: "redis:latest"
+    ports:
+      - "6379:6379"

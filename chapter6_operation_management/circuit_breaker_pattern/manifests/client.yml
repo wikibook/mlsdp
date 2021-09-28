@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client
+  namespace: circuit-breaker
+  annotations:
+    sidecar.istio.io/inject: "true"
+    sidecar.istio.io/proxyCPU: "128m"
+    sidecar.istio.io/proxyMemory: "128Mi"
+    proxy.istio.io/config: "{'concurrency':'16'}"
+spec:
+  containers:
+    - name: client
+      image: shibui/ml-system-in-actions:circuit_breaker_pattern_client_0.0.1
+      imagePullPolicy: Always
+      command:
+        - tail
+        - -f
+        - /dev/null
+      resources:
+        requests:
+          cpu: 1000m
+          memory: "1000Mi"
+      volumeMounts:
+        - name: client
+          mountPath: "/opt/vegeta"
+          readOnly: true
+  volumes:
+    - name: client
+      configMap:
+        name: client
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: client
+  namespace: circuit-breaker
+data:
+  get-target: "GET http://iris-svc.circuit-breaker.svc.cluster.local:8000/predict/test"
+  post-target: "POST http://iris-svc.circuit-breaker.svc.cluster.local:8000/predict\nContent-Type: application/json\n@/opt/data.json"

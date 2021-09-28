@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client
+  namespace: prediction-log
+spec:
+  containers:
+    - name: client
+      image: shibui/ml-system-in-actions:shadow_ab_pattern_client_0.0.1
+      imagePullPolicy: Always
+      command:
+        - tail
+        - -f
+        - /dev/null
+      resources:
+        requests:
+          cpu: 200m
+          memory: "200Mi"
+      volumeMounts:
+        - name: client
+          mountPath: "/opt/vegeta"
+          readOnly: true
+  volumes:
+    - name: client
+      configMap:
+        name: client
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: client
+  namespace: prediction-log
+data:
+  get-target: "GET http://api.prediction-log.svc.cluster.local:8000/predict/test"

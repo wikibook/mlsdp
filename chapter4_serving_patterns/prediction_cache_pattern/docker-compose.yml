@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  proxy:
+    container_name: proxy
+    image: shibui/ml-system-in-actions:prediction_cache_pattern_proxy_0.0.1
+    restart: always
+    environment:
+      - PLATFORM=docker_compose
+      - API_ADDRESS=pred
+      - CACHE_HOST=redis
+    ports:
+      - "8000:8000"
+    command: ./run.sh
+    depends_on:
+      - pred
+      - redis
+
+  pred:
+    container_name: pred
+    image: shibui/ml-system-in-actions:prediction_cache_pattern_pred_0.0.1
+    restart: always
+    environment:
+      - HTTP_PORT=8001
+      - GRPC_PORT=50051
+    ports:
+      - "8001:8001"
+      - "50051:50051"
+    entrypoint: ["./onnx_runtime_server_entrypoint.sh"]
+
+  redis:
+    container_name: redis
+    image: "redis:latest"
+    ports:
+      - "6379:6379"

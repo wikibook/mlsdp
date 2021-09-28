@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+  proxy:
+    container_name: proxy
+    image: shibui/ml-system-in-actions:parameter_based_pattern_proxy_0.0.1
+    restart: always
+    environment:
+      - PLATFORM=docker_compose
+      - APP_NAME=src.api_composition_proxy.app.proxy:app
+      - PORT=9000
+      - SERVICE_SETOSA=service_setosa:8000
+      - SERVICE_VERSICOLOR=service_versicolor:8001
+      - SERVICE_VIRGINICA=service_virginica:8002
+      - THRESHOLD_SETOSA=0.9
+      - THRESHOLD_VERSICOLOR=0.85
+      - THRESHOLD_VIRGINICA=0.95
+      - ACTIVATE_SETOSA=1
+      - ACTIVATE_VERSICOLOR=1
+      - ACTIVATE_VIRGINICA=0
+    ports:
+      - "9000:9000"
+    command: ./run.sh
+    depends_on:
+      - service_setosa
+      - service_versicolor
+      - service_virginica
+
+  service_setosa:
+    container_name: service_setosa
+    image: shibui/ml-system-in-actions:parameter_based_pattern_setosa_0.0.1
+    restart: always
+    environment:
+      - PLATFORM=docker_compose
+      - PORT=8000
+      - MODE=setosa
+    ports:
+      - "8000:8000"
+    command: ./run.sh
+
+  service_versicolor:
+    container_name: service_versicolor
+    image: shibui/ml-system-in-actions:parameter_based_pattern_versicolor_0.0.1
+    restart: always
+    environment:
+      - PLATFORM=docker_compose
+      - PORT=8001
+      - MODE=versicolor
+    ports:
+      - "8001:8001"
+    command: ./run.sh
+
+  service_virginica:
+    container_name: service_virginica
+    image: shibui/ml-system-in-actions:parameter_based_pattern_virginica_0.0.1
+    restart: always
+    environment:
+      - PLATFORM=docker_compose
+      - PORT=8002
+      - MODE=virginica
+    ports:
+      - "8002:8002"
+    command: ./run.sh
