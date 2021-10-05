@@ -11,7 +11,7 @@
 - Kubernetes 클러스터 또는 minikube
 
 이 프로그램은 Kubernetes 클러스터 또는 minikube 가 필요합니다.
-Kubernetes 클러스터는 독자적으로 구축하거나, 각 클라우드 매니지드 서비스（GCP GKE、AWS EKS、MS Azure AKS 等）를 이용해 주십시오.
+Kubernetes 클러스터는 독자적으로 구축하거나, 각 클라우드 매니지드 서비스（GCP GKE、AWS EKS、MS Azure AKS 등）를 이용해 주십시오.
 GCP GKE 클러스터로 가동을 확인했습니다.
 
 - [Kubernetes 클러스터 구축](https://kubernetes.io/ja/docs/setup/)
