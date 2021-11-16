@@ -1,4 +1,4 @@
-# AI 엔지니어를 위한 머신러닝 시스템 디자인 패턴 (가제)
+# 머신러닝 시스템 디자인 패턴: AI 엔지니어를 위한
 
 machine learning system examples
 
